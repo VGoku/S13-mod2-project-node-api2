@@ -47,8 +47,12 @@ router.post("/", (req, res) => {
     } else {
         // console.log("success!!!")
         Post.insert({ title, contents })
-        .then(stuff => {
-            console.log(stuff);
+        .then(({ id }) => {
+            // console.log(id);
+            return Post.findById(id)
+        })
+        .then(post => {
+            res.status(201).json(post)
         })
         .catch(err => {
             res.status(500).json({
