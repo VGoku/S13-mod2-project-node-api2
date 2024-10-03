@@ -39,7 +39,26 @@ router.get("/:id", async (req, res) => {
     }
 })
 router.post("/", (req, res) => {
-
+    const { title, contents } = req.body;
+    if (!title || !contents) {
+        res.status(400).json({
+            message: "Please provide title and contents for the post",
+        })
+    } else {
+        // console.log("success!!!")
+        Post.insert({ title, contents })
+        .then(stuff => {
+            console.log(stuff);
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: "There was an error while saving the post to the database",
+                err: err.message,
+                stack: err.stack,
+            })
+        })
+        
+    }
 })
 router.delete("/:id", (req, res) => {
 
