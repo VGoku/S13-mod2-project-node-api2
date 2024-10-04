@@ -68,7 +68,7 @@ router.post("/", (req, res) => {
 router.delete("/:id", async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
-        console.log(`Attempting to delete post with ID: ${req.params.id}`);
+        // console.log(`Attempting to delete post with ID: ${req.params.id}`);
 
         if (!post) {
             return res.status(404).json({
@@ -76,11 +76,11 @@ router.delete("/:id", async (req, res) => {
             });
         } else {
             await Post.remove(req.params.id);
-            console.log(`Deleted post: ${post}`);
+            // console.log(`Deleted post: ${post}`);
             res.json(post);
         }
     } catch (err) {
-        console.error(err); // Log the error for debugging
+        // console.error(err); // Log the error for debugging
         res.status(500).json({
             message: "The post could not be removed",
             err: err.message,
@@ -89,9 +89,45 @@ router.delete("/:id", async (req, res) => {
     }
 });
 
-router.put("/:id", (req, res) => {
 
-})
+router.put("/:id", (req, res) => {
+    const { title, contents } = req.body;
+    if (!title || !contents) {
+        return res.status(400).json({
+            message: "Please provide title and contents for the post",
+        });
+    } else {
+        Post.findById(req.params.id)
+            .then(stuff => {
+                if (!stuff) {
+                    return res.status(404).json({
+                        message: "The post with the specified ID does not exist",
+                    });
+                } else {
+                    return Post.update(req.params.id, req.body);
+                }
+            })
+            .then(data => {
+                // Check if update was successful
+                if (data) {
+                    return Post.findById(req.params.id);
+                }
+            })
+            .then(post => {
+                if (post) {
+                    res.json(post);
+                }
+            })
+            .catch(err => {
+                res.status(500).json({
+                    message: "The post information could not be retrieved",
+                    err: err.message,
+                    stack: err.stack,
+                });
+            });
+    }
+});
+
 router.get("/:id/messages", (req, res) => {
 
 })
